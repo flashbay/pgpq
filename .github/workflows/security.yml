@@ -1,0 +1,23 @@
+name: Security
+on:
+  push:
+    branches: [ main, master ]   # repos default to either
+  pull_request: {}
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+
+jobs:
+  security:
+    uses: flashbay/.github/.github/workflows/security.yml@main
+    with:
+      min-severity: HIGH
+      fail-on-findings: true
+      upload-sarif: false
+      slack-notify: true
+    secrets: inherit   # SLACK_WEBHOOK_URL (optional)
+    # The reusable's enforce step needs these, or the run fails at startup:
+    permissions:
+      contents: write        # delete a blocking PR's branch
+      security-events: write
+      pull-requests: write   # comment on + close a blocking PR
+      id-token: write        # sign in to AWS (OIDC) to email the committer through SES
